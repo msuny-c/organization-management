@@ -62,13 +62,13 @@ jobs:
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/apps/organization-management/organization-management.jar"
 
       - name: Restart service on server
-        env:
-          JAVA_BIN: ${{ secrets.JAVA_BIN }}
         run: |
-          ssh -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" bash -lc '
-              set -e
-              cd ~/apps/organization-management
-              [ -n "'"${JAVA_BIN}"'" ] && export JAVA_BIN="'"${JAVA_BIN}"'"
-              ./appctl.sh restart
-            '
+            ssh -n -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "set -euo pipefail; cd ~/apps/organization-management && ./appctl.sh restart"
+
+      - name: Healthcheck
+        run: |
+            ssh -n -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            'PORT=${SERVER_PORT}; for i in $(jot 60); do nc -z 127.0.0.1 "$PORT" && exit 0; sleep 1; done; echo "Port $PORT not open"; exit 1'
