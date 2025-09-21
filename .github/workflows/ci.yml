@@ -65,7 +65,7 @@ jobs:
         run: |
             ssh -n -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "set -euo pipefail; cd ~/apps/organization-management && ./appctl.sh restart"
+            "set -euo pipefail; cd ~/apps/organization-management && env SERVER_PORT=${{ secrets.SERVER_PORT }} ./appctl.sh restart"
 
       - name: Healthcheck
         run: |
