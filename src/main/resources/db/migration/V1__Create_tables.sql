@@ -1,5 +1,4 @@
--- Создание таблицы location
-CREATE TABLE s408194.location (
+CREATE TABLE location (
     id BIGSERIAL PRIMARY KEY,
     x INTEGER NOT NULL,
     y REAL NOT NULL,
@@ -7,22 +6,19 @@ CREATE TABLE s408194.location (
     name VARCHAR(255) NOT NULL
 );
 
--- Создание таблицы coordinates
-CREATE TABLE s408194.coordinates (
+CREATE TABLE coordinates (
     id BIGSERIAL PRIMARY KEY,
     x INTEGER NOT NULL CHECK (x <= 882),
     y DOUBLE PRECISION NOT NULL CHECK (y > -540)
 );
 
--- Создание таблицы address
-CREATE TABLE s408194.address (
+CREATE TABLE address (
     id BIGSERIAL PRIMARY KEY,
     zip_code VARCHAR(255) CHECK (zip_code IS NULL OR LENGTH(zip_code) >= 7),
     town_id BIGINT NOT NULL REFERENCES location(id)
 );
 
--- Создание таблицы organization
-CREATE TABLE s408194.organization (
+CREATE TABLE organization (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     coordinates_id BIGINT NOT NULL REFERENCES coordinates(id),
@@ -37,10 +33,9 @@ CREATE TABLE s408194.organization (
     version BIGINT DEFAULT 0
 );
 
--- Индексы для улучшения производительности
-CREATE INDEX idx_organization_name ON s408194.organization(name);
-CREATE INDEX idx_organization_rating ON s408194.organization(rating);
-CREATE INDEX idx_organization_type ON s408194.organization(type);
-CREATE INDEX idx_organization_coordinates ON s408194.organization(coordinates_id);
-CREATE INDEX idx_coordinates_x_y ON s408194.coordinates(x, y);
-CREATE INDEX idx_address_town ON s408194.address(town_id);
+CREATE INDEX idx_organization_name ON organization(name);
+CREATE INDEX idx_organization_rating ON organization(rating);
+CREATE INDEX idx_organization_type ON organization(type);
+CREATE INDEX idx_organization_coordinates ON organization(coordinates_id);
+CREATE INDEX idx_coordinates_x_y ON coordinates(x, y);
+CREATE INDEX idx_address_town ON address(town_id);

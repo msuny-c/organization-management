@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST}/${POSTGRES_DBNAME}?currentSchema=s408194
+    url: jdbc:postgresql://${POSTGRES_HOST}/${POSTGRES_DBNAME}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -32,7 +32,7 @@ spring:
     locale-resolver: fixed
 
 server:
-  port: 34256
+  port: 8080
   servlet:
     context-path: /
 

@@ -5,7 +5,6 @@ function connectWebSocket() {
     stompClient = Stomp.over(socket);
     
     stompClient.connect({}, function (frame) {
-        console.log('Connected to WebSocket: ' + frame);
         
         stompClient.subscribe('/topic/organizations', function (message) {
             const event = JSON.parse(message.body);
@@ -15,14 +14,12 @@ function connectWebSocket() {
         console.error('WebSocket connection error:', error);
         
         setTimeout(() => {
-            console.log('Attempting to reconnect WebSocket...');
             connectWebSocket();
         }, 5000);
     });
 }
 
 function handleOrganizationEvent(event) {
-    console.log('Received organization event:', event);
     
     const currentPath = window.location.pathname;
     
@@ -205,7 +202,5 @@ function showToast(message, bgClass = 'bg-info') {
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof SockJS !== 'undefined' && typeof Stomp !== 'undefined') {
         connectWebSocket();
-    } else {
-        console.warn('SockJS or Stomp not loaded, WebSocket functionality disabled');
     }
 });
