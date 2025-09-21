@@ -71,4 +71,4 @@ jobs:
         run: |
             ssh -n -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            'PORT=${SERVER_PORT}; for i in $(jot 60); do nc -z 127.0.0.1 "$PORT" && exit 0; sleep 1; done; echo "Port $PORT not open"; exit 1'
+            'for i in $(jot 60); do nc -z 127.0.0.1 ${{ secrets.SERVER_PORT }} && exit 0; sleep 1; done; echo "Port ${{ secrets.SERVER_PORT }} not open"; exit 1'
