@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>Список организаций</title>
+</head>
+<body>
+    <main th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-building"></i> Организации</h1>
+            <a href="/organizations/create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Создать организацию
+            </a>
+        </div>
+
+        <!-- Поиск -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form method="get" class="input-group">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Поиск по названию или полному названию..." 
+                           th:value="${search}">
+                    <input type="hidden" name="page" th:value="${currentPage}">
+                    <input type="hidden" name="size" th:value="${pageSize}">
+                    <input type="hidden" name="sort" th:value="${sortField}">
+                    <input type="hidden" name="dir" th:value="${sortDir}">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i> Поиск
+                    </button>
+                    <a href="/organizations" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Сбросить
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Таблица организаций -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>
+                            <a th:href="@{/organizations(page=${currentPage}, size=${pageSize}, sort='id', dir=${sortField == 'id' ? reverseSortDir : 'asc'}, search=${search})}" 
+                               class="text-white text-decoration-none">
+                                ID 
+                                <i th:if="${sortField == 'id'}" 
+                                   th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/organizations(page=${currentPage}, size=${pageSize}, sort='name', dir=${sortField == 'name' ? reverseSortDir : 'asc'}, search=${search})}" 
+                               class="text-white text-decoration-none">
+                                Название 
+                                <i th:if="${sortField == 'name'}" 
+                                   th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                            </a>
+                        </th>
+                        <th>Координаты</th>
+                        <th>Дата создания</th>
+                        <th>Сотрудники</th>
+                        <th>
+                            <a th:href="@{/organizations(page=${currentPage}, size=${pageSize}, sort='rating', dir=${sortField == 'rating' ? reverseSortDir : 'asc'}, search=${search})}" 
+                               class="text-white text-decoration-none">
+                                Рейтинг 
+                                <i th:if="${sortField == 'rating'}" 
+                                   th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                            </a>
+                        </th>
+                        <th>Тип</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="org : ${organizations.content}" th:data-org-id="${org.id}">
+                        <td th:text="${org.id}"></td>
+                        <td>
+                            <div th:text="${org.name}" class="fw-bold"></div>
+                            <small th:if="${org.fullName}" th:text="${org.fullName}" class="text-muted"></small>
+                        </td>
+                        <td th:if="${org.coordinates}">
+                            <small>X: <span th:text="${org.coordinates.x}"></span><br>
+                            Y: <span th:text="${org.coordinates.y}"></span></small>
+                        </td>
+                        <td th:text="${#temporals.format(org.creationDate, 'dd.MM.yyyy HH:mm')}"></td>
+                        <td>
+                            <span th:text="${org.employeesCount}" class="badge bg-info"></span>
+                        </td>
+                        <td>
+                            <span th:text="${org.rating}" class="badge bg-warning text-dark"></span>
+                        </td>
+                        <td>
+                            <span th:if="${org.type}" th:text="${org.type}" class="badge bg-secondary"></span>
+                            <span th:unless="${org.type}" class="text-muted">—</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a th:href="@{/organizations/{id}(id=${org.id})}" 
+                                   class="btn btn-outline-primary" title="Просмотр">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a th:href="@{/organizations/{id}/edit(id=${org.id})}" 
+                                   class="btn btn-outline-warning" title="Редактировать">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger" 
+                                        data-bs-toggle="modal" 
+                                        th:data-bs-target="'#deleteModal' + ${org.id}"
+                                        title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Модальное окно подтверждения удаления -->
+                            <div class="modal fade" th:id="'deleteModal' + ${org.id}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Подтверждение удаления</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Вы уверены, что хотите удалить организацию 
+                                               <strong th:text="${org.name}"></strong>?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                            <form th:action="@{/organizations/{id}/delete(id=${org.id})}" method="post" style="display: inline;">
+                                                <button type="submit" class="btn btn-danger">Удалить</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пагинация -->
+        <nav th:if="${organizations.totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:class="${organizations.first} ? 'disabled'">
+                    <a class="page-link" 
+                       th:href="@{/organizations(page=${currentPage-1}, size=${pageSize}, sort=${sortField}, dir=${sortDir}, search=${search})}">
+                        Предыдущая
+                    </a>
+                </li>
+                
+                <li th:each="pageNum : ${#numbers.sequence(0, organizations.totalPages-1)}" 
+                    class="page-item" 
+                    th:class="${pageNum == currentPage} ? 'active'">
+                    <a class="page-link" 
+                       th:href="@{/organizations(page=${pageNum}, size=${pageSize}, sort=${sortField}, dir=${sortDir}, search=${search})}"
+                       th:text="${pageNum + 1}"></a>
+                </li>
+                
+                <li class="page-item" th:class="${organizations.last} ? 'disabled'">
+                    <a class="page-link" 
+                       th:href="@{/organizations(page=${currentPage+1}, size=${pageSize}, sort=${sortField}, dir=${sortDir}, search=${search})}">
+                        Следующая
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Информация о результатах -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <small class="text-muted">
+                Показано <span th:text="${organizations.numberOfElements}"></span> из 
+                <span th:text="${organizations.totalElements}"></span> записей
+            </small>
+            <div>
+                <label>Записей на странице:</label>
+                <select class="form-select form-select-sm d-inline-block w-auto" 
+                        onchange="location.href='?page=0&size=' + this.value + '&sort=' + '[[${sortField}]]' + '&dir=' + '[[${sortDir}]]' + '&search=' + '[[${search ?: \'\'}]]'">
+                    <option value="10" th:selected="${pageSize == 10}">10</option>
+                    <option value="25" th:selected="${pageSize == 25}">25</option>
+                    <option value="50" th:selected="${pageSize == 50}">50</option>
+                </select>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

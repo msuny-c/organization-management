@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Специальные операции</title>
+</head>
+<body>
+    <main th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-tools"></i> Специальные операции</h1>
+            <a href="/organizations" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> К списку
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Левая колонка - формы операций -->
+            <div class="col-lg-6">
+                <!-- Поиск организации с минимальными координатами -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-geo-alt"></i> Минимальные координаты</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Найти организацию с минимальными координатами (по X, затем по Y)</p>
+                        <form th:action="@{/operations/minimal-coordinates}" method="post">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Найти
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Группировка по рейтингу -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-bar-chart"></i> Группировка по рейтингу</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Показать количество организаций для каждого рейтинга</p>
+                        <form th:action="@{/operations/group-by-rating}" method="post">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-bar-chart"></i> Группировать
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Подсчет по типу -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-calculator"></i> Подсчет по типу</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Подсчитать количество организаций указанного типа</p>
+                        <form th:action="@{/operations/count-by-type}" method="post">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Тип организации</label>
+                                <select class="form-select" name="type" id="type" required>
+                                    <option value="">Выберите тип...</option>
+                                    <option th:each="type : ${organizationTypes}" 
+                                            th:value="${type}" 
+                                            th:text="${type}"></option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-calculator"></i> Подсчитать
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Увольнение всех сотрудников -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning">
+                        <h5><i class="bi bi-person-x"></i> Увольнение сотрудников</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Уволить всех сотрудников организации (установить количество в 0)</p>
+                        <form th:action="@{/operations/dismiss-employees}" method="post">
+                            <div class="mb-3">
+                                <label for="organizationId" class="form-label">ID организации</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="organizationId" 
+                                       name="organizationId" 
+                                       min="1" 
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-person-x"></i> Уволить всех
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Поглощение организации -->
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5><i class="bi bi-arrow-down-up"></i> Поглощение организации</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Поглотить одну организацию другой (суммировать сотрудников и удалить поглощаемую)</p>
+                        <form th:action="@{/operations/absorb}" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="absorbingId" class="form-label">Поглощающая (ID)</label>
+                                        <input type="number" 
+                                               class="form-control" 
+                                               id="absorbingId" 
+                                               name="absorbingId" 
+                                               min="1" 
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="absorbedId" class="form-label">Поглощаемая (ID)</label>
+                                        <input type="number" 
+                                               class="form-control" 
+                                               id="absorbedId" 
+                                               name="absorbedId" 
+                                               min="1" 
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-arrow-down-up"></i> Поглотить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка - результаты -->
+            <div class="col-lg-6">
+                <!-- Результат поиска минимальных координат -->
+                <div th:if="${minimalOrganization}" class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="bi bi-check-circle"></i> Организация с минимальными координатами</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 th:text="${minimalOrganization.name}"></h6>
+                        <p class="mb-1"><strong>ID:</strong> <span th:text="${minimalOrganization.id}"></span></p>
+                        <p class="mb-1"><strong>Координаты:</strong> 
+                            X: <span th:text="${minimalOrganization.coordinates?.x}"></span>, 
+                            Y: <span th:text="${minimalOrganization.coordinates?.y}"></span>
+                        </p>
+                        <p class="mb-0">
+                            <a th:href="@{/organizations/{id}(id=${minimalOrganization.id})}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> Подробнее
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Результат группировки по рейтингу -->
+                <div th:if="${ratingGroups}" class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5><i class="bi bi-bar-chart"></i> Группировка по рейтингу</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Рейтинг</th>
+                                        <th>Количество</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="entry : ${ratingGroups}">
+                                        <td>
+                                            <span th:text="${entry.key}" class="badge bg-warning text-dark"></span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${entry.value}" class="badge bg-secondary"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Результат подсчета по типу -->
+                <div th:if="${typeCount != null}" class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5><i class="bi bi-calculator"></i> Подсчет по типу</h5>
+                    </div>
+                    <div class="card-body">
+                        <h4>
+                            Тип <span th:text="${selectedType}" class="badge bg-secondary"></span>: 
+                            <span th:text="${typeCount}" class="badge bg-primary"></span> организаций
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+services:
+  organizations-postgres:
+    image: postgres:16
+    container_name: organizations-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DBNAME}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - organizations-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    env_file:
+      - ./.env
+
+  app:
+    build: .
+    container_name: organizations-service
+    depends_on:
+      organizations-postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    env_file:
+      - ./.env
+
+volumes:
+  organizations-postgres-data:
