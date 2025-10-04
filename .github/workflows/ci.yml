@@ -49,28 +49,24 @@ jobs:
           path: .
 
       - name: Create app.env file from secrets
+        env:
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+          ALL_VARS: ${{ toJSON(vars) }}
         run: |
-          cat > app.env << 'EOF'
-          ${{ toJSON(secrets) }}
-          ${{ toJSON(vars) }}
-          EOF
-          
           python << 'PYTHON'
           import json
           import os
           
-          with open('app.env', 'r') as f:
-              content = f.read()
-          
-          lines = content.strip().split('\n')
-          secrets = json.loads(lines[0]) if lines else {}
-          vars = json.loads(lines[1]) if len(lines) > 1 else {}
+          secrets = json.loads(os.environ.get('ALL_SECRETS', '{}'))
+          vars = json.loads(os.environ.get('ALL_VARS', '{}'))
           
           with open('app.env', 'w') as f:
               for key, value in {**secrets, **vars}.items():
                   if key not in ['SSH_KEY', 'SSH_HOST', 'SSH_PORT', 'SSH_USER']:
                       f.write(f'{key}={value}\n')
           PYTHON
+          
+          echo "Created app.env with $(wc -l < app.env) variables"
 
       - name: Prepare SSH
         run: |
