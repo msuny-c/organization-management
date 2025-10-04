@@ -67,9 +67,13 @@ public class OrganizationService {
         organization.setCreationDate(LocalDate.now());
         
         organization.setCoordinates(getOrCreateCoordinates(dto));
-        organization.setPostalAddress(getOrCreateAddress(dto.getPostalAddressId(), dto.getPostalAddress()));
         
-        if (dto.getOfficialAddressId() != null || dto.getOfficialAddress() != null) {
+        Address postalAddress = getOrCreateAddress(dto.getPostalAddressId(), dto.getPostalAddress());
+        organization.setPostalAddress(postalAddress);
+        
+        if (Boolean.TRUE.equals(dto.getReusePostalAddressAsOfficial())) {
+            organization.setOfficialAddress(postalAddress);
+        } else if (dto.getOfficialAddressId() != null || dto.getOfficialAddress() != null) {
             organization.setOfficialAddress(getOrCreateAddress(dto.getOfficialAddressId(), dto.getOfficialAddress()));
         }
         
@@ -94,11 +98,15 @@ public class OrganizationService {
             existing.setCoordinates(getOrCreateCoordinates(dto));
         }
         
+        Address postalAddress = null;
         if (dto.getPostalAddressId() != null || dto.getPostalAddress() != null) {
-            existing.setPostalAddress(getOrCreateAddress(dto.getPostalAddressId(), dto.getPostalAddress()));
+            postalAddress = getOrCreateAddress(dto.getPostalAddressId(), dto.getPostalAddress());
+            existing.setPostalAddress(postalAddress);
         }
         
-        if (dto.getOfficialAddressId() != null || dto.getOfficialAddress() != null) {
+        if (Boolean.TRUE.equals(dto.getReusePostalAddressAsOfficial()) && postalAddress != null) {
+            existing.setOfficialAddress(postalAddress);
+        } else if (dto.getOfficialAddressId() != null || dto.getOfficialAddress() != null) {
             existing.setOfficialAddress(getOrCreateAddress(dto.getOfficialAddressId(), dto.getOfficialAddress()));
         }
         

@@ -220,12 +220,13 @@
                                 <label for="officialAddressId" class="form-label">Выбрать существующий</label>
                                 <select class="form-select" id="officialAddressId" name="officialAddressId">
                                     <option value="">Не указывать...</option>
-                                    <option value="-1">Создать новый...</option>
                                     <option th:each="addr : ${addresses}" 
                                             th:value="${addr.id}" 
                                             th:text="${addr.zipCode} + ' - ' + ${addr.town?.name}"></option>
                                 </select>
                             </div>
+                            
+                            <input type="hidden" id="reusePostalAddressAsOfficial" name="reusePostalAddressAsOfficial" value="false">
 
                             <div id="newOfficialAddress" style="display: none;">
                                 <div class="mb-3">

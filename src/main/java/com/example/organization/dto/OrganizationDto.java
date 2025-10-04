@@ -37,6 +37,8 @@ public class OrganizationDto {
     private Long postalAddressId;
     private AddressDto postalAddress;
     
+    private Boolean reusePostalAddressAsOfficial;
+    
     private Long version;
     
     public OrganizationDto() {}
@@ -151,6 +153,14 @@ public class OrganizationDto {
     
     public void setPostalAddress(AddressDto postalAddress) {
         this.postalAddress = postalAddress;
+    }
+    
+    public Boolean getReusePostalAddressAsOfficial() {
+        return reusePostalAddressAsOfficial;
+    }
+    
+    public void setReusePostalAddressAsOfficial(Boolean reusePostalAddressAsOfficial) {
+        this.reusePostalAddressAsOfficial = reusePostalAddressAsOfficial;
     }
     
     public Long getVersion() {
