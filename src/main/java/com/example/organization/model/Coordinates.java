@@ -2,6 +2,7 @@ package com.example.organization.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -15,15 +16,16 @@ public class Coordinates {
     @NotNull
     @Max(882)
     @Column(nullable = false)
-    private Integer x;
+    private Double x;
     
     @NotNull
+    @Min(-539)
     @Column(nullable = false)
-    private Double y;
+    private long y;
     
     public Coordinates() {}
     
-    public Coordinates(Integer x, Double y) {
+    public Coordinates(Double x, long y) {
         this.x = x;
         this.y = y;
     }
@@ -36,19 +38,19 @@ public class Coordinates {
         this.id = id;
     }
     
-    public Integer getX() {
+    public Double getX() {
         return x;
     }
     
-    public void setX(Integer x) {
+    public void setX(Double x) {
         this.x = x;
     }
     
-    public Double getY() {
+    public long getY() {
         return y;
     }
     
-    public void setY(Double y) {
+    public void setY(long y) {
         this.y = y;
     }
 }

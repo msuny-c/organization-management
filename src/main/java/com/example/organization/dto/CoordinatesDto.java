@@ -1,6 +1,7 @@
 package com.example.organization.dto;
 
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class CoordinatesDto {
@@ -9,14 +10,15 @@ public class CoordinatesDto {
     
     @NotNull(message = "Координата X не может быть null")
     @Max(value = 882, message = "Координата X не может быть больше 882")
-    private Integer x;
+    private Double x;
     
     @NotNull(message = "Координата Y не может быть null")
-    private Double y;
+    @Min(value = -539, message = "Координата Y должна быть больше -540")
+    private Long y;
     
     public CoordinatesDto() {}
     
-    public CoordinatesDto(Long id, Integer x, Double y) {
+    public CoordinatesDto(Long id, Double x, Long y) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -30,19 +32,19 @@ public class CoordinatesDto {
         this.id = id;
     }
     
-    public Integer getX() {
+    public Double getX() {
         return x;
     }
     
-    public void setX(Integer x) {
+    public void setX(Double x) {
         this.x = x;
     }
     
-    public Double getY() {
+    public Long getY() {
         return y;
     }
     
-    public void setY(Double y) {
+    public void setY(Long y) {
         this.y = y;
     }
 }

@@ -204,3 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
         connectWebSocket();
     }
 });
+
+window.addEventListener('beforeunload', function() {
+    if (stompClient !== null && stompClient.connected) {
+        stompClient.disconnect();
+    }
+});

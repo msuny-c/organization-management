@@ -2,7 +2,7 @@ package com.example.organization.dto;
 
 import com.example.organization.model.OrganizationType;
 import jakarta.validation.constraints.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class OrganizationDto {
     
@@ -14,21 +14,22 @@ public class OrganizationDto {
     private Long coordinatesId;
     private CoordinatesDto coordinates;
     
-    private LocalDateTime creationDate;
+    private LocalDate creationDate;
     
     private Long officialAddressId;
     private AddressDto officialAddress;
     
     @Positive(message = "Годовой оборот должен быть положительным")
-    private Long annualTurnover;
+    private Integer annualTurnover;
     
     @Min(value = 0, message = "Количество сотрудников не может быть отрицательным")
-    private Long employeesCount;
+    private Integer employeesCount;
     
     @Positive(message = "Рейтинг должен быть положительным")
     @NotNull(message = "Рейтинг не может быть null")
-    private Integer rating;
+    private Long rating;
     
+    @Pattern(regexp = "^$|^(?!\\s*$).+", message = "Полное название не может быть пустой строкой")
     private String fullName;
     
     private OrganizationType type;
@@ -72,11 +73,11 @@ public class OrganizationDto {
         this.coordinates = coordinates;
     }
     
-    public LocalDateTime getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
     
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
     
@@ -96,27 +97,27 @@ public class OrganizationDto {
         this.officialAddress = officialAddress;
     }
     
-    public Long getAnnualTurnover() {
+    public Integer getAnnualTurnover() {
         return annualTurnover;
     }
     
-    public void setAnnualTurnover(Long annualTurnover) {
+    public void setAnnualTurnover(Integer annualTurnover) {
         this.annualTurnover = annualTurnover;
     }
     
-    public Long getEmployeesCount() {
+    public Integer getEmployeesCount() {
         return employeesCount;
     }
     
-    public void setEmployeesCount(Long employeesCount) {
+    public void setEmployeesCount(Integer employeesCount) {
         this.employeesCount = employeesCount;
     }
     
-    public Integer getRating() {
+    public Long getRating() {
         return rating;
     }
     
-    public void setRating(Integer rating) {
+    public void setRating(Long rating) {
         this.rating = rating;
     }
     

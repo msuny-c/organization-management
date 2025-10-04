@@ -2,7 +2,7 @@ package com.example.organization.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "organization")
@@ -22,7 +22,7 @@ public class Organization {
     private Coordinates coordinates;
     
     @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;
+    private LocalDate creationDate;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "official_address_id")
@@ -30,15 +30,15 @@ public class Organization {
     
     @Positive
     @Column(name = "annual_turnover")
-    private Long annualTurnover;
+    private Integer annualTurnover;
     
     @Min(0)
     @Column(name = "employees_count", nullable = false)
-    private Long employeesCount;
+    private int employeesCount;
     
     @Positive
     @Column(nullable = false)
-    private Integer rating;
+    private long rating;
     
     @Column(name = "full_name", unique = true)
     private String fullName;
@@ -58,7 +58,7 @@ public class Organization {
     
     @PrePersist
     public void onCreate() {
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = LocalDate.now();
     }
     
     public Long getId() {
@@ -85,11 +85,11 @@ public class Organization {
         this.coordinates = coordinates;
     }
     
-    public LocalDateTime getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
     
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
     
@@ -101,27 +101,27 @@ public class Organization {
         this.officialAddress = officialAddress;
     }
     
-    public Long getAnnualTurnover() {
+    public Integer getAnnualTurnover() {
         return annualTurnover;
     }
     
-    public void setAnnualTurnover(Long annualTurnover) {
+    public void setAnnualTurnover(Integer annualTurnover) {
         this.annualTurnover = annualTurnover;
     }
     
-    public Long getEmployeesCount() {
+    public int getEmployeesCount() {
         return employeesCount;
     }
     
-    public void setEmployeesCount(Long employeesCount) {
+    public void setEmployeesCount(int employeesCount) {
         this.employeesCount = employeesCount;
     }
     
-    public Integer getRating() {
+    public long getRating() {
         return rating;
     }
     
-    public void setRating(Integer rating) {
+    public void setRating(long rating) {
         this.rating = rating;
     }
     

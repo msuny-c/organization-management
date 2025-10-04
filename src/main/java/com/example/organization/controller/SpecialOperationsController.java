@@ -44,10 +44,9 @@ public class SpecialOperationsController {
     @PostMapping("/group-by-rating")
     public String groupByRating(Model model, RedirectAttributes redirectAttributes) {
         try {
-            Map<Integer, Long> ratingGroups = organizationService.groupByRating();
-            model.addAttribute("ratingGroups", ratingGroups);
-            model.addAttribute("organizationTypes", OrganizationType.values());
-            return "operations/index";
+            Map<Long, Long> ratingGroups = organizationService.groupByRating();
+            redirectAttributes.addFlashAttribute("ratingGroups", ratingGroups);
+            return "redirect:/operations";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Ошибка: " + e.getMessage());
             return "redirect:/operations";
@@ -61,10 +60,9 @@ public class SpecialOperationsController {
             RedirectAttributes redirectAttributes) {
         try {
             long count = organizationService.countByType(type);
-            model.addAttribute("typeCount", count);
-            model.addAttribute("selectedType", type);
-            model.addAttribute("organizationTypes", OrganizationType.values());
-            return "operations/index";
+            redirectAttributes.addFlashAttribute("typeCount", count);
+            redirectAttributes.addFlashAttribute("selectedType", type);
+            return "redirect:/operations";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Ошибка: " + e.getMessage());
             return "redirect:/operations";

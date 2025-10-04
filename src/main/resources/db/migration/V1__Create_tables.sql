@@ -1,15 +1,15 @@
 CREATE TABLE location (
     id BIGSERIAL PRIMARY KEY,
     x INTEGER NOT NULL,
-    y REAL NOT NULL,
-    z BIGINT NOT NULL,
+    y INTEGER NOT NULL,
+    z DOUBLE PRECISION NOT NULL,
     name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE coordinates (
     id BIGSERIAL PRIMARY KEY,
-    x INTEGER NOT NULL CHECK (x <= 882),
-    y DOUBLE PRECISION NOT NULL CHECK (y > -540)
+    x DOUBLE PRECISION NOT NULL CHECK (x <= 882),
+    y BIGINT NOT NULL CHECK (y > -540)
 );
 
 CREATE TABLE address (
@@ -22,11 +22,11 @@ CREATE TABLE organization (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     coordinates_id BIGINT NOT NULL REFERENCES coordinates(id),
-    creation_date TIMESTAMP NOT NULL,
+    creation_date DATE NOT NULL,
     official_address_id BIGINT REFERENCES address(id),
-    annual_turnover BIGINT CHECK (annual_turnover IS NULL OR annual_turnover > 0),
-    employees_count BIGINT NOT NULL CHECK (employees_count >= 0),
-    rating INTEGER NOT NULL CHECK (rating > 0),
+    annual_turnover INTEGER CHECK (annual_turnover IS NULL OR annual_turnover > 0),
+    employees_count INTEGER NOT NULL CHECK (employees_count >= 0),
+    rating BIGINT NOT NULL CHECK (rating > 0),
     full_name VARCHAR(255) UNIQUE,
     type VARCHAR(50),
     postal_address_id BIGINT NOT NULL REFERENCES address(id),

@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,7 +64,7 @@ public class OrganizationService {
     
     public OrganizationDto create(OrganizationDto dto) {
         Organization organization = mapper.toEntity(dto);
-        organization.setCreationDate(LocalDateTime.now());
+        organization.setCreationDate(LocalDate.now());
         
         organization.setCoordinates(getOrCreateCoordinates(dto));
         organization.setPostalAddress(getOrCreateAddress(dto.getPostalAddressId(), dto.getPostalAddress()));
@@ -132,11 +132,11 @@ public class OrganizationService {
     }
     
     @Transactional(readOnly = true)
-    public Map<Integer, Long> groupByRating() {
+    public Map<Long, Long> groupByRating() {
         List<Object[]> results = organizationRepository.countByRatingGrouped();
         return results.stream()
                 .collect(Collectors.toMap(
-                    result -> (Integer) result[0],
+                    result -> (Long) result[0],
                     result -> (Long) result[1]
                 ));
     }
@@ -150,7 +150,7 @@ public class OrganizationService {
         Organization organization = organizationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Организация с ID " + id + " не найдена"));
         
-        organization.setEmployeesCount(0L);
+        organization.setEmployeesCount(0);
         Organization updated = organizationRepository.save(organization);
         OrganizationDto result = mapper.toDto(updated);
         webSocketEventService.notifyEmployeesDismissed(result);
@@ -158,6 +158,10 @@ public class OrganizationService {
     }
     
     public OrganizationDto absorb(Long absorbingId, Long absorbedId) {
+        if (absorbingId.equals(absorbedId)) {
+            throw new IllegalArgumentException("Организация не может поглотить саму себя");
+        }
+        
         Organization absorbing = organizationRepository.findById(absorbingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Поглощающая организация с ID " + absorbingId + " не найдена"));
         
@@ -195,20 +199,31 @@ public class OrganizationService {
         if (addressId != null) {
             return addressRepository.findById(addressId)
                     .orElseThrow(() -> new ResourceNotFoundException("Адрес с ID " + addressId + " не найден"));
-        } else if (addressDto != null) {
+        } else if (addressDto != null && addressDto.getZipCode() != null && addressDto.getZipCode().length() >= 7) {
             Address address = mapper.toEntity(addressDto);
+            
             if (addressDto.getTownId() != null) {
                 Location town = locationRepository.findById(addressDto.getTownId())
                         .orElseThrow(() -> new ResourceNotFoundException("Локация с ID " + addressDto.getTownId() + " не найдена"));
                 address.setTown(town);
-            } else if (addressDto.getTown() != null) {
+            } else if (addressDto.getTown() != null && isLocationValid(addressDto.getTown())) {
                 Location town = mapper.toEntity(addressDto.getTown());
                 town = locationRepository.save(town);
                 address.setTown(town);
+            } else {
+                throw new IllegalArgumentException("Необходимо указать город для адреса");
             }
+            
             return addressRepository.save(address);
         }
         return null;
+    }
+    
+    private boolean isLocationValid(com.example.organization.dto.LocationDto locationDto) {
+        return locationDto.getX() != null && 
+               locationDto.getY() != null && 
+               locationDto.getZ() != null && 
+               locationDto.getName() != null && !locationDto.getName().trim().isEmpty();
     }
     
     private void cleanupOrphanedObjects(Coordinates coordinates, Address officialAddress, Address postalAddress) {

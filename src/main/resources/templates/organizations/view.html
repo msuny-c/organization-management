@@ -6,15 +6,13 @@
 <body>
     <main th:fragment="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="bi bi-building"></i> <span th:text="${organization.name}"></span></h1>
             <div>
-                <a th:href="@{/organizations/{id}/edit(id=${organization.id})}" class="btn btn-warning">
-                    <i class="bi bi-pencil"></i> Редактировать
-                </a>
-                <a href="/organizations" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> К списку
-                </a>
+                <h1 class="mb-1"><i class="bi bi-building me-2"></i><span th:text="${organization.name}"></span></h1>
+                <p class="text-muted mb-0">Детальная информация об организации</p>
             </div>
+            <a th:href="@{/organizations/{id}/edit(id=${organization.id})}" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Редактировать
+            </a>
         </div>
 
         <div class="row">
@@ -35,7 +33,7 @@
                             <dd class="col-sm-8" th:text="${organization.fullName ?: 'Не указано'}"></dd>
 
                             <dt class="col-sm-4">Дата создания:</dt>
-                            <dd class="col-sm-8" th:text="${#temporals.format(organization.creationDate, 'dd.MM.yyyy HH:mm:ss')}"></dd>
+                            <dd class="col-sm-8" th:text="${#temporals.format(organization.creationDate, 'dd.MM.yyyy')}"></dd>
 
                             <dt class="col-sm-4">Тип организации:</dt>
                             <dd class="col-sm-8">
@@ -63,7 +61,6 @@
             </div>
 
             <div class="col-lg-4">
-                <!-- Координаты -->
                 <div class="card mb-3" th:if="${organization.coordinates}">
                     <div class="card-header">
                         <h6><i class="bi bi-geo-alt"></i> Координаты</h6>
@@ -98,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Официальный адрес -->
                 <div class="card mb-3" th:if="${organization.officialAddress}">
                     <div class="card-header">
                         <h6><i class="bi bi-building-check"></i> Официальный адрес</h6>

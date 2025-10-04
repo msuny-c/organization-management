@@ -10,17 +10,17 @@ public class LocationDto {
     private Integer x;
     
     @NotNull(message = "Координата Y не может быть null")
-    private Float y;
+    private Integer y;
     
     @NotNull(message = "Координата Z не может быть null")
-    private Long z;
+    private Double z;
     
     @NotNull(message = "Имя не может быть null")
     private String name;
     
     public LocationDto() {}
     
-    public LocationDto(Long id, Integer x, Float y, Long z, String name) {
+    public LocationDto(Long id, Integer x, Integer y, Double z, String name) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -44,19 +44,19 @@ public class LocationDto {
         this.x = x;
     }
     
-    public Float getY() {
+    public Integer getY() {
         return y;
     }
     
-    public void setY(Float y) {
+    public void setY(Integer y) {
         this.y = y;
     }
     
-    public Long getZ() {
+    public Double getZ() {
         return z;
     }
     
-    public void setZ(Long z) {
+    public void setZ(Double z) {
         this.z = z;
     }
     

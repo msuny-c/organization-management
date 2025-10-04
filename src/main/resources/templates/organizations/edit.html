@@ -5,222 +5,254 @@
 </head>
 <body>
     <main th:fragment="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="bi bi-pencil"></i> Редактирование организации</h1>
-            <div>
-                <a th:href="@{/organizations/{id}(id=${organization.id})}" class="btn btn-info">
-                    <i class="bi bi-eye"></i> Просмотр
-                </a>
-                <a href="/organizations" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> К списку
-                </a>
-            </div>
+        <div class="mb-4">
+            <h1 class="mb-1"><i class="bi bi-pencil me-2"></i>Редактирование организации</h1>
+            <p class="text-muted mb-0">Внесение изменений в данные организации</p>
         </div>
 
-        <form th:action="@{/organizations/{id}/edit(id=${organization.id})}" th:object="${organization}" method="post">
-            <input type="hidden" th:field="*{id}">
-            <input type="hidden" th:field="*{version}">
-            <input type="hidden" th:field="*{creationDate}">
-            
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="bi bi-info-circle"></i> Основная информация</h5>
+        <div class="card">
+            <div class="card-body p-4">
+                <form th:action="@{/organizations/{id}/edit(id=${organization.id})}" th:object="${organization}" method="post">
+                    <input type="hidden" th:field="*{id}">
+                    <input type="hidden" th:field="*{version}">
+                    <input type="hidden" th:field="*{creationDate}">
+                    
+                    <div class="mb-4">
+                        <h5 class="mb-3"><i class="bi bi-info-circle me-2"></i>Основная информация</h5>
+                        <div class="form-grid">
+                        <div>
+                            <label for="name" class="form-label">Название *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   th:field="*{name}" 
+                                   required>
                         </div>
-                        <div class="card-body">
-                            <!-- Название -->
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Название *</label>
-                                <input type="text" 
+
+                        <div>
+                            <label for="fullName" class="form-label">Полное название</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="fullName" 
+                                   th:field="*{fullName}">
+                        </div>
+                    </div>
+
+                    <div class="form-group-inline">
+                        <div>
+                            <label for="employeesCount" class="form-label">Количество сотрудников *</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="employeesCount" 
+                                   th:field="*{employeesCount}" 
+                                   min="0" 
+                                   required>
+                        </div>
+
+                        <div>
+                            <label for="rating" class="form-label">Рейтинг *</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="rating" 
+                                   th:field="*{rating}" 
+                                   min="1" 
+                                   required>
+                        </div>
+
+                        <div>
+                            <label for="annualTurnover" class="form-label">Годовой оборот (в рублях)</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="annualTurnover" 
+                                   th:field="*{annualTurnover}" 
+                                   min="1">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="type" class="form-label">Тип организации</label>
+                        <select class="form-select" id="type" th:field="*{type}">
+                            <option value="">Выберите тип...</option>
+                            <option th:each="type : ${organizationTypes}" 
+                                    th:value="${type}" 
+                                    th:text="${type}"></option>
+                        </select>
+                    </div>
+                    </div>
+
+                    <div class="mb-4">
+                    <div class="alert alert-info">
+                        <strong><i class="bi bi-info-circle me-2"></i>Дата создания:</strong> 
+                        <span th:text="${#temporals.format(organization.creationDate, 'dd.MM.yyyy')}"></span>
+                    </div>
+
+                    <h5 class="mb-3"><i class="bi bi-geo-alt me-2"></i>Координаты</h5>
+                    <div>
+                    <div class="mb-3">
+                        <label for="coordinatesId" class="form-label">Выбрать существующие</label>
+                        <select class="form-select" id="coordinatesId" th:field="*{coordinatesId}">
+                            <option value="">Создать новые...</option>
+                            <option th:each="coord : ${coordinates}" 
+                                    th:value="${coord.id}" 
+                                    th:text="'X: ' + ${coord.x} + ', Y: ' + ${coord.y}"
+                                    th:selected="${coord.id == organization.coordinatesId}"></option>
+                        </select>
+                        <small class="form-text text-muted" th:if="${organization.coordinates}">
+                            Текущие: X: <span th:text="${organization.coordinates.x}"></span>, 
+                            Y: <span th:text="${organization.coordinates.y}"></span>
+                        </small>
+                    </div>
+                    
+                    <div id="newCoordinates" style="display: none;">
+                        <div class="form-group-inline">
+                            <div>
+                                <label class="form-label">X *</label>
+                                <input type="number" 
+                                       step="0.01" 
                                        class="form-control" 
-                                       th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
-                                       id="name" 
-                                       th:field="*{name}" 
-                                       required>
-                                <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
+                                       th:field="*{coordinates.x}" 
+                                       placeholder="0.0">
                             </div>
-
-                            <!-- Полное название -->
-                            <div class="mb-3">
-                                <label for="fullName" class="form-label">Полное название</label>
-                                <input type="text" 
+                            <div>
+                                <label class="form-label">Y (> -540) *</label>
+                                <input type="number" 
                                        class="form-control" 
-                                       th:class="${#fields.hasErrors('fullName')} ? 'form-control is-invalid' : 'form-control'"
-                                       id="fullName" 
-                                       th:field="*{fullName}">
-                                <div th:if="${#fields.hasErrors('fullName')}" class="invalid-feedback" th:errors="*{fullName}"></div>
+                                       th:field="*{coordinates.y}" 
+                                       min="-539" 
+                                       placeholder="0">
                             </div>
+                        </div>
+                    </div>
+                    </div>
 
-                            <div class="row">
-                                <!-- Количество сотрудников -->
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="employeesCount" class="form-label">Количество сотрудников *</label>
-                                        <input type="number" 
-                                               class="form-control" 
-                                               th:class="${#fields.hasErrors('employeesCount')} ? 'form-control is-invalid' : 'form-control'"
-                                               id="employeesCount" 
-                                               th:field="*{employeesCount}" 
-                                               min="0" 
-                                               required>
-                                        <div th:if="${#fields.hasErrors('employeesCount')}" class="invalid-feedback" th:errors="*{employeesCount}"></div>
+                    <div class="mb-4">
+
+                    <h5 class="mb-3"><i class="bi bi-envelope me-2"></i>Почтовый адрес</h5>
+                    <div>
+                    <div class="mb-3">
+                        <label for="postalAddressId" class="form-label">Выбрать существующий</label>
+                        <select class="form-select" id="postalAddressId" th:field="*{postalAddressId}">
+                            <option value="">Создать новый...</option>
+                            <option th:each="addr : ${addresses}" 
+                                    th:value="${addr.id}" 
+                                    th:text="${addr.zipCode} + ' - ' + ${addr.town?.name}"
+                                    th:selected="${addr.id == organization.postalAddressId}"></option>
+                        </select>
+                        <small class="form-text text-muted" th:if="${organization.postalAddress}">
+                            Текущий: 
+                            <span th:text="${organization.postalAddress.zipCode}"></span> - 
+                            <span th:text="${organization.postalAddress.town?.name}"></span>
+                        </small>
+                    </div>
+                    
+                    <div id="newPostalAddress" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Почтовый индекс (≥ 7 символов) *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   th:field="*{postalAddress.zipCode}" 
+                                   minlength="7"
+                                   placeholder="0000000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Город *</label>
+                            <select class="form-select" th:field="*{postalAddress.townId}">
+                                <option value="">Создать новый...</option>
+                                <option th:each="location : ${locations}" 
+                                        th:value="${location.id}" 
+                                        th:text="${location.name}"></option>
+                            </select>
+                        </div>
+                        <div id="newPostalTown">
+                            <div class="mb-3">
+                                <label class="form-label">Название города *</label>
+                                <input type="text" class="form-control" th:field="*{postalAddress.town.name}" placeholder="Москва">
+                            </div>
+                            <div class="form-group-inline">
+                                <div>
+                                    <label class="form-label">X *</label>
+                                    <input type="number" class="form-control" th:field="*{postalAddress.town.x}" placeholder="0">
+                                </div>
+                                <div>
+                                    <label class="form-label">Y *</label>
+                                    <input type="number" class="form-control" th:field="*{postalAddress.town.y}" placeholder="0">
+                                </div>
+                                <div>
+                                    <label class="form-label">Z *</label>
+                                    <input type="number" step="0.01" class="form-control" th:field="*{postalAddress.town.z}" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="mb-4">
+
+                    <h5 class="mb-3"><i class="bi bi-building-check me-2"></i>Официальный адрес</h5>
+                    <div>
+                    <div class="mb-3">
+                        <label for="officialAddressId" class="form-label">Выбрать существующий</label>
+                        <select class="form-select" id="officialAddressId" name="officialAddressId">
+                            <option value="">Не указывать...</option>
+                            <option value="-1">Создать новый...</option>
+                            <option th:each="addr : ${addresses}" 
+                                    th:value="${addr.id}" 
+                                    th:text="${addr.zipCode} + ' - ' + ${addr.town?.name}"
+                                    th:selected="${organization.officialAddressId != null and addr.id == organization.officialAddressId}"></option>
+                        </select>
+                        <small class="form-text text-muted" th:if="${organization.officialAddress}">
+                            Текущий: 
+                            <span th:text="${organization.officialAddress.zipCode}"></span> - 
+                            <span th:text="${organization.officialAddress.town?.name}"></span>
+                        </small>
+                    </div>
+                    <div id="newOfficialAddress" style="display: none;">
+                                <div class="mb-2">
+                                    <label class="form-label">Почтовый индекс (≥ 7 символов)</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           th:field="*{officialAddress.zipCode}" 
+                                           minlength="7">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Город</label>
+                                    <select class="form-select" th:field="*{officialAddress.townId}">
+                                        <option value="">Создать новый...</option>
+                                        <option th:each="location : ${locations}" 
+                                                th:value="${location.id}" 
+                                                th:text="${location.name}"></option>
+                                    </select>
+                                </div>
+                                <div id="newOfficialTown" class="row">
+                                    <div class="col-12 mb-2">
+                                        <label class="form-label">Название города</label>
+                                        <input type="text" class="form-control" th:field="*{officialAddress.town.name}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label">X</label>
+                                        <input type="number" class="form-control" th:field="*{officialAddress.town.x}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label">Y</label>
+                                        <input type="number" class="form-control" th:field="*{officialAddress.town.y}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label">Z</label>
+                                        <input type="number" step="0.01" class="form-control" th:field="*{officialAddress.town.z}">
                                     </div>
                                 </div>
-
-                                <!-- Рейтинг -->
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="rating" class="form-label">Рейтинг *</label>
-                                        <input type="number" 
-                                               class="form-control" 
-                                               th:class="${#fields.hasErrors('rating')} ? 'form-control is-invalid' : 'form-control'"
-                                               id="rating" 
-                                               th:field="*{rating}" 
-                                               min="1" 
-                                               required>
-                                        <div th:if="${#fields.hasErrors('rating')}" class="invalid-feedback" th:errors="*{rating}"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Годовой оборот -->
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="annualTurnover" class="form-label">Годовой оборот</label>
-                                        <input type="number" 
-                                               class="form-control" 
-                                               th:class="${#fields.hasErrors('annualTurnover')} ? 'form-control is-invalid' : 'form-control'"
-                                               id="annualTurnover" 
-                                               th:field="*{annualTurnover}" 
-                                               min="1">
-                                        <div th:if="${#fields.hasErrors('annualTurnover')}" class="invalid-feedback" th:errors="*{annualTurnover}"></div>
-                                    </div>
-                                </div>
                             </div>
-
-                            <!-- Тип организации -->
-                            <div class="mb-3">
-                                <label for="type" class="form-label">Тип организации</label>
-                                <select class="form-select" 
-                                        th:class="${#fields.hasErrors('type')} ? 'form-select is-invalid' : 'form-select'"
-                                        id="type" 
-                                        th:field="*{type}">
-                                    <option value="">Выберите тип...</option>
-                                    <option th:each="type : ${organizationTypes}" 
-                                            th:value="${type}" 
-                                            th:text="${type}"></option>
-                                </select>
-                                <div th:if="${#fields.hasErrors('type')}" class="invalid-feedback" th:errors="*{type}"></div>
-                            </div>
-                        </div>
                     </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <!-- Текущие значения -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h6><i class="bi bi-info-circle-fill"></i> Текущие значения</h6>
-                        </div>
-                        <div class="card-body">
-                            <small class="text-muted">
-                                <strong>Дата создания:</strong><br>
-                                <span th:text="${#temporals.format(organization.creationDate, 'dd.MM.yyyy HH:mm')}"></span>
-                            </small>
-                        </div>
                     </div>
 
-                    <!-- Координаты -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h6><i class="bi bi-geo-alt"></i> Координаты *</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="coordinatesId" class="form-label">Выбрать существующие</label>
-                                <select class="form-select" id="coordinatesId" th:field="*{coordinatesId}">
-                                    <option value="">Создать новые...</option>
-                                    <option th:each="coord : ${coordinates}" 
-                                            th:value="${coord.id}" 
-                                            th:text="'X: ' + ${coord.x} + ', Y: ' + ${coord.y}"
-                                            th:selected="${coord.id == organization.coordinatesId}"></option>
-                                </select>
-                            </div>
-                            <div id="currentCoordinates" th:if="${organization.coordinates}">
-                                <small class="text-muted">
-                                    <strong>Текущие:</strong> X: <span th:text="${organization.coordinates.x}"></span>, 
-                                    Y: <span th:text="${organization.coordinates.y}"></span>
-                                </small>
-                            </div>
-                        </div>
+                    <div class="pt-3 border-top">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Сохранить изменения
+                        </button>
                     </div>
-
-                    <!-- Почтовый адрес -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h6><i class="bi bi-envelope"></i> Почтовый адрес *</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="postalAddressId" class="form-label">Выбрать существующий</label>
-                                <select class="form-select" id="postalAddressId" th:field="*{postalAddressId}">
-                                    <option value="">Создать новый...</option>
-                                    <option th:each="addr : ${addresses}" 
-                                            th:value="${addr.id}" 
-                                            th:text="${addr.zipCode} + ' - ' + ${addr.town?.name}"
-                                            th:selected="${addr.id == organization.postalAddressId}"></option>
-                                </select>
-                            </div>
-                            <div th:if="${organization.postalAddress}">
-                                <small class="text-muted">
-                                    <strong>Текущий:</strong> 
-                                    <span th:text="${organization.postalAddress.zipCode}"></span> - 
-                                    <span th:text="${organization.postalAddress.town?.name}"></span>
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Официальный адрес -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h6><i class="bi bi-building-check"></i> Официальный адрес</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="officialAddressId" class="form-label">Выбрать существующий</label>
-                                <select class="form-select" id="officialAddressId" th:field="*{officialAddressId}">
-                                    <option value="">Не указывать...</option>
-                                    <option th:each="addr : ${addresses}" 
-                                            th:value="${addr.id}" 
-                                            th:text="${addr.zipCode} + ' - ' + ${addr.town?.name}"
-                                            th:selected="${addr.id == organization.officialAddressId}"></option>
-                                </select>
-                            </div>
-                            <div th:if="${organization.officialAddress}">
-                                <small class="text-muted">
-                                    <strong>Текущий:</strong> 
-                                    <span th:text="${organization.officialAddress.zipCode}"></span> - 
-                                    <span th:text="${organization.officialAddress.town?.name}"></span>
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-check-circle"></i> Сохранить изменения
-                </button>
-                <a th:href="@{/organizations/{id}(id=${organization.id})}" class="btn btn-info">
-                    <i class="bi bi-eye"></i> Просмотр
-                </a>
-                <a href="/organizations" class="btn btn-secondary">
-                    <i class="bi bi-x-circle"></i> Отмена
-                </a>
-            </div>
-        </form>
+        </div>
     </main>
 </body>
 </html>

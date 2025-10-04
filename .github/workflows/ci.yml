@@ -48,6 +48,30 @@ jobs:
           name: jar
           path: .
 
+      - name: Create app.env file from secrets
+        run: |
+          cat > app.env << 'EOF'
+          ${{ toJSON(secrets) }}
+          ${{ toJSON(vars) }}
+          EOF
+          
+          python << 'PYTHON'
+          import json
+          import os
+          
+          with open('app.env', 'r') as f:
+              content = f.read()
+          
+          lines = content.strip().split('\n')
+          secrets = json.loads(lines[0]) if lines else {}
+          vars = json.loads(lines[1]) if len(lines) > 1 else {}
+          
+          with open('app.env', 'w') as f:
+              for key, value in {**secrets, **vars}.items():
+                  if key not in ['SSH_KEY', 'SSH_HOST', 'SSH_PORT', 'SSH_USER']:
+                      f.write(f'{key}={value}\n')
+          PYTHON
+
       - name: Prepare SSH
         run: |
           mkdir -p ~/.ssh
@@ -55,17 +79,20 @@ jobs:
           chmod 600 ~/.ssh/id_key
           ssh-keyscan -p "${{ secrets.SSH_PORT }}" -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Upload JAR to server
+      - name: Upload JAR and app.env to server
         run: |
           scp -P "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
             ./*.jar \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/apps/organization-management/organization-management.jar"
+          scp -P "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
+            app.env \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/apps/organization-management/app.env"
 
       - name: Restart service on server
         run: |
             ssh -n -p "${{ secrets.SSH_PORT }}" -i ~/.ssh/id_key \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "set -euo pipefail; cd ~/apps/organization-management && env SERVER_PORT=${{ vars.SERVER_PORT }} ./appctl.sh restart"
+            "set -euo pipefail; cd ~/apps/organization-management && ./appctl.sh restart"
 
       - name: Healthcheck
         run: |

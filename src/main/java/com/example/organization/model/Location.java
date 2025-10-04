@@ -17,11 +17,11 @@ public class Location {
     
     @NotNull
     @Column(nullable = false)
-    private Float y;
+    private Integer y;
     
     @NotNull
     @Column(nullable = false)
-    private Long z;
+    private Double z;
     
     @NotNull
     @Column(nullable = false)
@@ -29,7 +29,7 @@ public class Location {
     
     public Location() {}
     
-    public Location(Integer x, Float y, Long z, String name) {
+    public Location(Integer x, Integer y, Double z, String name) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -52,19 +52,19 @@ public class Location {
         this.x = x;
     }
     
-    public Float getY() {
+    public Integer getY() {
         return y;
     }
     
-    public void setY(Float y) {
+    public void setY(Integer y) {
         this.y = y;
     }
     
-    public Long getZ() {
+    public Double getZ() {
         return z;
     }
     
-    public void setZ(Long z) {
+    public void setZ(Double z) {
         this.z = z;
     }
     
