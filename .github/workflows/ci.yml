@@ -62,7 +62,7 @@ jobs:
           
           with open('app.env', 'w') as f:
               for key, value in {**secrets, **vars}.items():
-                  if key not in ['SSH_KEY', 'SSH_HOST', 'SSH_PORT', 'SSH_USER']:
+                  if key not in ['SSH_KEY', 'SSH_HOST', 'SSH_PORT', 'SSH_USER', 'github_token']:
                       f.write(f'{key}={value}\n')
           PYTHON
           
