@@ -17,5 +17,9 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
            "LOWER(l.name) LIKE LOWER(CONCAT('%', :term, '%'))")
     List<Location> findBySearchTerm(@Param("term") String term);
     
+    @Query("SELECT l FROM Location l WHERE NOT EXISTS " +
+           "(SELECT a FROM Address a WHERE a.town = l)")
+    List<Location> findOrphaned();
+    
     boolean existsById(Long id);
 }

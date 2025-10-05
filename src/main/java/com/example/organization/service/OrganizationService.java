@@ -248,8 +248,11 @@ public class OrganizationService {
                 Location town = officialAddress.getTown();
                 addressRepository.delete(officialAddress);
                 
-                if (town != null && locationRepository.existsById(town.getId())) {
-                    locationRepository.delete(town);
+                if (town != null) {
+                    List<Location> orphanedLocations = locationRepository.findOrphaned();
+                    if (orphanedLocations.contains(town)) {
+                        locationRepository.delete(town);
+                    }
                 }
             }
         }
@@ -260,8 +263,11 @@ public class OrganizationService {
                 Location town = postalAddress.getTown();
                 addressRepository.delete(postalAddress);
                 
-                if (town != null && locationRepository.existsById(town.getId())) {
-                    locationRepository.delete(town);
+                if (town != null) {
+                    List<Location> orphanedLocations = locationRepository.findOrphaned();
+                    if (orphanedLocations.contains(town)) {
+                        locationRepository.delete(town);
+                    }
                 }
             }
         }
